@@ -2,7 +2,7 @@
   "name": "api.lengstorf.com",
   "version": "0.0.2",
   "description": "Back-end processing for lengstorf.com",
-  "main": "app/index.js",
+  "main": "app/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
