@@ -26,7 +26,12 @@ server.route({
   method: 'POST',
   path: '/user',
   handler: (request, reply) => {
-    mailchimp.upsertSubscriber(request.payload, reply);
+    mailchimp.upsertSubscriber(request.payload, reply)
+      .then(redirect => {
+
+        // Every request supplies a redirect URI.
+        reply.redirect(redirect);
+      });
   },
 });
 
