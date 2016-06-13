@@ -88,43 +88,45 @@ const buildSubscriberData = data => {
  * @return {Void}
  */
 const upsertSubscriber = (data, callback) => {
-  const userHash = getSubscriberHash(data.EMAIL);
-  const subscriberData = JSON.stringify(buildSubscriberData(data));
+  return new Promise((resolve, reject) => {
+    const userHash = getSubscriberHash(data.EMAIL);
+    const subscriberData = JSON.stringify(buildSubscriberData(data));
 
-  // Configure the options for the MailChimp API request.
-  const options = {
-    method: 'PUT',
-    host: process.env.MC_API_URL,
-    path: `/3.0/lists/${process.env.MC_LIST_ID}/members/${userHash}`,
-    auth: 'apikey:' + process.env.MC_API_KEY,
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': subscriberData.length,
-    },
-  };
+    // Configure the options for the MailChimp API request.
+    const options = {
+      method: 'PUT',
+      host: process.env.MC_API_URL,
+      path: `/3.0/lists/${process.env.MC_LIST_ID}/members/${userHash}`,
+      auth: 'apikey:' + process.env.MC_API_KEY,
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': subscriberData.length,
+      },
+    };
 
-  // Create the request and set up handlers.
-  const request = https.request(options, response => {
-    let data = '';
+    // Create the request and set up handlers.
+    const request = https.request(options, response => {
+      let apiResponse = '';
 
-    // The data is sent before the `end` event, so we have to capture it here.
-    response.on('data', chunk => {
-      data += chunk;
+      // The data is sent before the `end` event, so we have to capture it here.
+      response.on('data', chunk => {
+        apiResponse += chunk;
+      });
+
+      // Once all the data is loaded, we end up here and fire the callback.
+      response.on('end', () => {
+
+        // TODO add error check and return a more solid true/false
+        resolve(data.redirect);
+      });
+    }).on('error', error => {
+      reject(JSON.stringify(`Error: ${error.message}`));
     });
 
-    // Once all the data is loaded, we end up here and fire the callback.
-    response.on('end', () => {
-
-      // TODO add error check and return a more solid true/false
-      callback(data);
-    });
-  }).on('error', error => {
-    callback(JSON.stringify(`Error: ${error.message}`));
+    // Add the subscriber’s data to the request body, then send it.
+    request.write(subscriberData);
+    request.end();
   });
-
-  // Add the subscriber’s data to the request body, then send it.
-  request.write(subscriberData);
-  request.end();
 };
 
 module.exports = {
