@@ -1,7 +1,11 @@
 'use strict';
 
-// Load `.env` into `process.env`
-require('dotenv').config();
+/*
+ * Load `.env` into `process.env`. Since this is deployed to Heroku (which has
+ * its own way of handling env vars), we need to silence the errors if a `.env`
+ * file isn’t present.
+ */
+require('dotenv').config({ silent: true });
 
 const Hapi = require('hapi');
 const server = new Hapi.Server();
