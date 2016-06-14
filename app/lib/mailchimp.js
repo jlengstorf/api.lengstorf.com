@@ -78,6 +78,8 @@ const buildSubscriberData = data => {
     }
   });
 
+  console.log(subscriber);
+
   return subscriber;
 };
 
@@ -115,6 +117,8 @@ const upsertSubscriber = (data, callback) => {
 
       // Once all the data is loaded, we end up here and fire the callback.
       response.on('end', () => {
+
+        console.log(JSON.parse(apiResponse));
 
         // TODO add error check and return a more solid true/false
         resolve(data.redirect);
