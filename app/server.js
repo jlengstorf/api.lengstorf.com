@@ -12,8 +12,8 @@ const server = new Hapi.Server();
 const mailchimp = require('./lib/mailchimp');
 
 server.connection({
-  host: process.env.HOST,
-  port: process.env.PORT,
+  host: process.env.HOST || '0.0.0.0',
+  port: process.env.PORT || 1350,
 });
 
 // This endpoint isn’t currently necessary, so there’s no reason to expose it.
