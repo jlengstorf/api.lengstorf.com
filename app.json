@@ -1,0 +1,29 @@
+{
+  "name": "api.lengstorf.com",
+  "scripts": {
+  },
+  "env": {
+    "MC_API_URL": {
+      "required": true
+    },
+    "MC_API_KEY": {
+      "required": true
+    },
+    "MC_LIST_ID": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "addons": [
+
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
