@@ -10,6 +10,24 @@
     },
     "MC_LIST_ID": {
       "required": true
+    },
+    "MG_API_KEY": {
+      "required": true
+    },
+    "MG_DOMAIN": {
+      "required": true
+    },
+    "CRYPTOKEY": {
+      "required": true
+    },
+    "TY_PRODUCTIVE": {
+      "required": true
+    },
+    "TY_TRAVEL": {
+      "required": true
+    },
+    "TY_WORKHAPPY": {
+      "required": true
     }
   },
   "formation": {
