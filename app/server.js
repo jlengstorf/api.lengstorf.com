@@ -10,31 +10,45 @@ require('dotenv').config({ silent: true });
 const Hapi = require('hapi');
 const server = new Hapi.Server();
 const mailchimp = require('./lib/mailchimp');
+const mailgun = require('./lib/mailgun');
+const encrypt = require('./lib/crypt').encrypt;
 
 server.connection({
   host: process.env.HOST || '0.0.0.0',
   port: process.env.PORT || 1350,
 });
 
-// This endpoint isn’t currently necessary, so there’s no reason to expose it.
-// server.route({
-//   method: 'GET',
-//   path: '/user/{email}',
-//   handler: (request, reply) => {
-//     mailchimp.getSubscriberData(request.params.email, reply);
-//   },
-// });
-
 // Handle form submissions to add someone to a given list.
 server.route({
   method: 'POST',
   path: '/user',
   handler: (request, reply) => {
-    mailchimp.upsertSubscriber(request.payload, reply)
-      .then(redirect => {
+    mailchimp.saveSubscriber(request.payload, reply)
+      .then(response => {
+        mailgun.sendConfirmation(response.data, response.confLink)
+          .then(() => {
+            reply.redirect(response.data.redirect);
+          })
+          .catch(error => {
+            reply(JSON.stringify(error));
+          });
+      })
+      .catch(error => {
+        reply(JSON.stringify(error));
+      });
+  },
+});
 
-        // Every request supplies a redirect URI.
-        reply.redirect(redirect);
+server.route({
+  method: 'GET',
+  path: '/confirm/{emailCrypt}/{groupCrypt}',
+  handler: (request, reply) => {
+    mailchimp.confirmSubscriber(request.params.emailCrypt, request.params.groupCrypt)
+      .then(redirectURI => {
+        reply.redirect(redirectURI);
+      })
+      .catch(error => {
+        reply(JSON.stringify(error));
       });
   },
 });
