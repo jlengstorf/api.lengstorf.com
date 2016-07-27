@@ -52,8 +52,8 @@ const sendMessage = (data, successCB, errorCB) => {
   }
 
   mg.messages.create(domain, message)
-    .then(successCB || () => {})
-    .catch(errorCB || () => {});
+    .then(successCB || (() => {}))
+    .catch(errorCB || (() => {}));
 };
 
 module.exports = {
