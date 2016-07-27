@@ -1,6 +1,6 @@
 {
   "name": "api.lengstorf.com",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Back-end processing for lengstorf.com",
   "main": "app/server.js",
   "scripts": {
