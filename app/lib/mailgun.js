@@ -51,10 +51,13 @@ const sendMessage = (data, successCB, errorCB) => {
     message.attachment = request(data.attachment);
   }
 
-  mg.messages.create(domain, message).then(successCB).catch(errorCB);
+  mg.messages.create(domain, message)
+    .then(successCB || () => {})
+    .catch(errorCB || () => {});
 };
 
 module.exports = {
+  sendMessage,
   sendConfirmation,
   testDecryption,
 };
