@@ -41,14 +41,16 @@ server.route({
   handler: (request, reply) => {
     mailchimp.saveSubscriber(request.payload, reply)
       .then(response => {
-        mailgun.sendConfirmation(response.data, response.confLink)
+        reply.redirect(response.data.redirect);
+
+        /*mailgun.sendConfirmation(response.data, response.confLink)
           .then(() => {
             reply.redirect(response.data.redirect);
           })
           .catch(error => {
             reportError(error);
             reply.redirect(process.env.ERROR_URI);
-          });
+          });*/
       })
       .catch(error => {
         reportError(error);
