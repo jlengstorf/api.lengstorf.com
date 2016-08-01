@@ -25,7 +25,7 @@ const reportError = (error) => {
   mailgun.sendMessage({
     to: 'Jason Lengstorf <jason@lengstorf.com>',
     subject: `api.lengstorf.com: ${error.title} Error (${error.status})`,
-    html: `<p>There was a ${error.title} Error (${error.status}) on api.lengstorf.com.</p><p>Details: ${error.detail}</p>`,
+    html: `<p>There was a ${error.title} Error (${error.status}) on api.lengstorf.com.</p><p>Details: ${error.detail}</p><p>Full Error: ${JSON.stringify(error, null, '  ')}</p>`,
   });
 }
 
