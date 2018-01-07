@@ -8,6 +8,15 @@ import {
 
 dotenv.config();
 
+jest.mock('node-fetch', () => (_, { body }) =>
+  Promise.resolve({
+    json: () =>
+      JSON.parse(body).email_address === 'test@lengstorf.com'
+        ? { email_address: 'test@lengstorf.com' }
+        : { status: 400, title: 'Invalid Resource' },
+  }),
+);
+
 const mockPOST = {
   EMAIL: 'test@lengstorf.com',
   status: 'pending',
