@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import cors from 'cors';
 import bodyParser from 'body-parser';
 import { saveSubscriber } from './mailchimp';
 import { convertErrorToBase64, getErrorAsJSON } from './errors';
@@ -6,12 +7,19 @@ import { convertErrorToBase64, getErrorAsJSON } from './errors';
 dotenv.config({ silent: true });
 
 const ERROR_URL = process.env.ERROR_URL;
+const CORS_WHITELIST = process.env.CORS_WHITELIST.split(',').map(function(s) {
+  return s.trim();
+});
 
 export const handleUserPOST = async (req, res) => {
   try {
     const redirect = await saveSubscriber(req.body);
 
-    res.redirect(redirect);
+    if (req.headers.accept === 'application/json') {
+      res.json({ redirect });
+    } else {
+      res.redirect(redirect);
+    }
   } catch (err) {
     const errJSON = getErrorAsJSON(err);
     const errURL = `${ERROR_URL}?error=${convertErrorToBase64(errJSON)}`;
@@ -20,10 +28,20 @@ export const handleUserPOST = async (req, res) => {
   }
 };
 
-export const configure = app => {
-  app.use(bodyParser.json());
+export const validateOrigin = (origin, callback) => {
+  if (CORS_WHITELIST.includes(origin)) {
+    callback(null, true);
+  } else {
+    callback(new Error(`Origin ${origin} is not allowed by CORS`));
+  }
+};
 
-  app.post('/user', handleUserPOST);
+export const configure = app => {
+  const corsOptions = { origin: validateOrigin };
+
+  app.use(bodyParser.json());
+  app.options('/user', cors(corsOptions));
+  app.post('/user', cors(corsOptions), handleUserPOST);
 
   return app;
 };

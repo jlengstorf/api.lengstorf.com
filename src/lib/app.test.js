@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { configure, serve, handleUserPOST } from './app';
+import { configure, serve, handleUserPOST, validateOrigin } from './app';
 import * as mailchimp from './mailchimp';
 import { getErrorAsJSON, convertErrorToBase64 } from './errors';
 
@@ -19,6 +19,12 @@ const mockApp = {
   listen: jest.fn(),
   use: jest.fn(),
   post: jest.fn(),
+  options: jest.fn(),
+};
+
+const mockReq = {
+  headers: {},
+  body: {},
 };
 
 const mockRes = {
@@ -32,13 +38,45 @@ describe('lib/app', () => {
     jest.clearAllMocks();
   });
 
+  describe('validateOrigin()', () => {
+    test('correctly validates CORS whitelisted origins', () => {
+      const testOrigin = process.env.CORS_WHITELIST.split(',')
+        .map(s => s.trim())
+        .find(v => v);
+      const cb = jest.fn();
+
+      validateOrigin(testOrigin, cb);
+
+      expect(cb).toBeCalledWith(null, true);
+    });
+
+    test('throws an error if in invalid origin is detected', () => {
+      const badOrigin = 'https://evil.org';
+      const cb = jest.fn();
+
+      validateOrigin(badOrigin, cb);
+      expect(cb).toBeCalledWith(
+        new Error('Origin https://evil.org is not allowed by CORS'),
+      );
+    });
+  });
+
   describe('handleUserPOST()', () => {
     test('redirects the user on a successful call', async () => {
       expect.assertions(1);
 
-      await handleUserPOST({ body: {} }, mockRes);
+      await handleUserPOST(mockReq, mockRes);
 
       expect(mockRes.redirect).toBeCalledWith('https://example.org/');
+    });
+
+    test('sends the redirect as JSON if the accept header specifies JSON', async () => {
+      expect.assertions(1);
+
+      const jsonReq = { headers: { accept: 'application/json' } };
+      await handleUserPOST(jsonReq, mockRes);
+
+      expect(mockRes.json).toBeCalledWith({ redirect: 'https://example.org/' });
     });
 
     test('sends the error as JSON', async () => {
