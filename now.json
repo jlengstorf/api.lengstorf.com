@@ -6,7 +6,7 @@
     "MC_API_URL": "https://us9.api.mailchimp.com/3.0",
     "MC_LIST_ID": "@api-lengstorf-mc-list-id",
     "CRYPTO_KEY": "@api-lengstorf-crypto-key",
-    "ERROR_URL": "https://lengstorf.com/error/ --public",
+    "ERROR_URL": "https://lengstorf.com/error/",
     "CORS_WHITELIST": "https://lengstorf.com,https://lengstorf.netlify.com"
   }
 }

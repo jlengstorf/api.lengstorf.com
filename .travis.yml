@@ -17,7 +17,7 @@ script:
 after_script:
 - "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
 after_success:
-- yarn deploy
+- yarn deploy --public
 - yarn alias
 branches:
   only:
@@ -25,5 +25,6 @@ branches:
   - "/^greenkeeper/.*$/"
 env:
   global:
+  - CORS_WHITELIST=https://lengstorf.com,https://lengstorf.netlify.com
   - CC_TEST_REPORTER_ID=96aa8c7e6ee82d203e00aa4d473a079de61d9c72b451062712934a05e046933d
   - secure: UNcoSCWrG8fRws/lnIF4hDSyTOOUY+0sjOGWOmlqUWslweJhu5Tcvg+JkZyna9IlVU1h9h7mrTNbdwkmLhjiPmu01LyCrRScXWogtcDWTbFdH6ynBXjoEO6iKwiV2T30v27/4UuEexKsEzlZJc+3a2DHRZRg2AydLbUs0sNpFpMia9D8wkhzCCje/SQlrrCcZSJYc4sTuf42Elw1qvrxAPIo7pHSWw3XYOg9nNEn/6BqeT7sOWXzIFGz5b9dZqgvBME1a1FwBXwHq2paYEiO9DQR9pUJ3goAyk1qfJwJ8AmeFh7hgPAmXU2xhx0ZNQYXGmYgc9uCoI5rfdi+MkrzpcB/wIv6hXDMYoorckVHIKAF6qyKXLJBrqkrXF0yaysBe67MdrhG/QTEnfo/kO9YIc8VtQYwgEunX3lRC744kzMb2ebkQFDiRR8tx6BylNnaDRyqbru72cUcC94/p6ZcCVLl0MAJFgXEiUFTLR2vUh2y1dzz1vrXxS2cmoQKdFaBgE2UT3omejKXAtixKku38Nuw0nIN7ZyezrhssYnvSpNX1O+RYrkwwJc8UHKlo/qNQi/6l8/O1LV+fKPsg/9tQ+/Hvywr2TZpx8PIcuWvPuNJmhWkl04k62GUy80yB4o998g9lZfczgsBdQkzwh7tckMm0t/deTYawhxsFjhC6hE=
