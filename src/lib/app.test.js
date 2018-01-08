@@ -1,5 +1,11 @@
 import dotenv from 'dotenv';
-import { configure, serve, handleUserPOST, validateOrigin } from './app';
+import {
+  configure,
+  serve,
+  handleUserPOST,
+  validateOrigin,
+  sendResponse,
+} from './app';
 import * as mailchimp from './mailchimp';
 import { getErrorAsJSON, convertErrorToBase64 } from './errors';
 
@@ -61,6 +67,23 @@ describe('lib/app', () => {
     });
   });
 
+  describe('sendResponse()', () => {
+    test('triggers a redirect by default', () => {
+      sendResponse(mockReq, mockRes, 'https://example.org');
+
+      expect(mockRes.json).not.toBeCalled();
+      expect(mockRes.redirect).toBeCalledWith('https://example.org');
+    });
+
+    test('sends JSON if the accept header is set', () => {
+      const jsonReq = { headers: { accept: 'application/json' } };
+      sendResponse(jsonReq, mockRes, 'https://example.org');
+
+      expect(mockRes.redirect).not.toBeCalled();
+      expect(mockRes.json).toBeCalledWith({ redirect: 'https://example.org' });
+    });
+  });
+
   describe('handleUserPOST()', () => {
     test('redirects the user on a successful call', async () => {
       expect.assertions(1);
@@ -70,23 +93,14 @@ describe('lib/app', () => {
       expect(mockRes.redirect).toBeCalledWith('https://example.org/');
     });
 
-    test('sends the redirect as JSON if the accept header specifies JSON', async () => {
-      expect.assertions(1);
-
-      const jsonReq = { headers: { accept: 'application/json' } };
-      await handleUserPOST(jsonReq, mockRes);
-
-      expect(mockRes.json).toBeCalledWith({ redirect: 'https://example.org/' });
-    });
-
-    test('sends the error as JSON', async () => {
+    test('sends the error as encoded JSON', async () => {
       expect.assertions(1);
 
       mailchimp.saveSubscriber.mockImplementationOnce(() => {
         throw Error('test');
       });
 
-      await handleUserPOST({ body: {} }, mockRes);
+      await handleUserPOST(mockReq, mockRes);
 
       const expectedError = convertErrorToBase64(getErrorAsJSON(Error('test')));
 

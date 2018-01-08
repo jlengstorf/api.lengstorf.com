@@ -11,20 +11,22 @@ const CORS_WHITELIST = process.env.CORS_WHITELIST.split(',').map(function(s) {
   return s.trim();
 });
 
+export const sendResponse = (req, res, redirect) => {
+  req.headers.accept === 'application/json'
+    ? res.json({ redirect })
+    : res.redirect(redirect);
+};
+
 export const handleUserPOST = async (req, res) => {
   try {
     const redirect = await saveSubscriber(req.body);
 
-    if (req.headers.accept === 'application/json') {
-      res.json({ redirect });
-    } else {
-      res.redirect(redirect);
-    }
+    sendResponse(req, res, redirect);
   } catch (err) {
     const errJSON = getErrorAsJSON(err);
     const errURL = `${ERROR_URL}?error=${convertErrorToBase64(errJSON)}`;
 
-    res.redirect(errURL);
+    sendResponse(req, res, errURL);
   }
 };
 
