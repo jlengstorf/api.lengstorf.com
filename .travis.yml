@@ -17,7 +17,7 @@ script:
 after_script:
 - "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
 after_success:
-- 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then yarn deploy --public; fi'
+- 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then yarn deploy; fi'
 - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then yarn alias; fi'
 branches:
   only:
